@@ -76,7 +76,7 @@
         width: 15%;
         will-change: transform;
         position: relative;
-        top: 80%;
+        top: 40%;
         left: 40%;
     }
     
@@ -138,6 +138,37 @@
     
     .btn-group button:not(:last-child) {
         border-bottom: none;
+    }
+    
+    .prefix {
+        position: relative;
+        left: 10%;
+    }
+    
+    .line {
+        position: relative;
+        left: 25%;
+    }
+    
+    .line.Fawn {
+        color: rebeccapurple;
+    }
+    
+    .line.Fight {
+        color: red
+    }
+    
+    .line.Freeze {
+        color: blue
+    }
+    
+    .line.Flight {
+        color: green
+    }
+    
+    .primary {
+        -webkit-text-stroke-width: 1.5px;
+        -webkit-text-stroke-color: white;
     }
     
     .grid {
@@ -238,7 +269,7 @@
 <body style="background-color: black; margin: 0;">
     <div class="content">
         <button class="start" onclick=next()>
-            <p>Next!</p>
+            <p>Start!</p>
         </div>
     </div>
     <div class="container">
@@ -580,7 +611,7 @@ d) Politely excuse yourself from the area and find a quieter space at the party
                     var nextButton = content.querySelector('.start')
                     content.removeChild(nextButton)
                     nextQuestion();
-                    //console.log(state)
+                    ////console.log(state)
                 }
 
                 function genQuestions() {
@@ -617,13 +648,13 @@ d) Politely excuse yourself from the area and find a quieter space at the party
 
 
                     if(phase == 'FFFF' && state.phase[phase] == 10) {
-                        console.log(state)
+                        //console.log(state)
 
                         var options = {'Fight': 0, 'Freeze': 0,'Fawn': 0,'Flight': 0, }
                         var mode = '';
                         Object.values(state.answers['FFFF']).forEach(answer => {
                             var char = answer.slice(0,1)
-                            console.log(char)
+                            //console.log(char)
                             if(char == 'a') {
                                 options['Fight'] = options['Fight'] + 1
                             }
@@ -663,7 +694,7 @@ d) Politely excuse yourself from the area and find a quieter space at the party
                        
                         Object.values(state.answers[phase]).forEach(answer => {
                             var char = answer.slice(0,1)
-                            console.log(char)
+                            //console.log(char)
                             if(char == 'a') {
                                 options[type1] = options[type1] + 1
                             }
@@ -695,7 +726,7 @@ d) Politely excuse yourself from the area and find a quieter space at the party
                         var question = Object.keys(state.questions[phase])[num];
                         var answers =  Object.values(state.questions[phase])[num]
 
-                        console.log(question, answers)
+                        //console.log(question, answers)
 
                         
 
@@ -710,7 +741,25 @@ d) Politely excuse yourself from the area and find a quieter space at the party
                     } else {
                         var answer = document.createElement('div')
                         answer.className = 'answer'
-                        answer.innerHTML = `Congratulations you are an ${type}!`;
+                        var prefix = document.createElement('div')
+                        prefix.className = 'prefix'
+                        prefix.innerHTML = `Congratulations you are an`
+
+                        answer.appendChild(prefix)
+                        var col = Object.keys(state.types[phase]).indexOf(type)
+                        var fourSides = Object.values(state.types).map(val => Object.keys(val)[col]).map(val => {
+                            var line = document.createElement('div')
+                            var mode = Object.entries(state.types).map(value => {
+                                return [value[0], Object.keys(value[1])]
+                            }).find(value => value[1].includes(val))[0]
+                            line.className = `line ${mode} ${val == type ? 'primary' : ''}`
+                            line.innerHTML = val
+
+                            answer.appendChild(line)
+                        })
+
+
+                        //answer.innerHTML = `Congratulations you are \n an \n ${type} and \n ${fourSides}!`;
                         content.removeChild(docQuestion)
                         content.appendChild(answer)
                     }
@@ -718,7 +767,7 @@ d) Politely excuse yourself from the area and find a quieter space at the party
                 }
 
                 function selectOption(option) {
-                        // console.log(option)
+                        // //console.log(option)
                         var phase = Object.keys(state.phase)[0]
                         var num = state.phase[phase]
 
