@@ -430,3 +430,6 @@ export class TRPI {
     }
 
 }
+
+const trpiInstance = new TRPI();
+trpiInstance.start();
