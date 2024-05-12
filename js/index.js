@@ -294,9 +294,17 @@ function start() {
     fill(360)
 
     var content = document.querySelector('.content');
+    var explanation = `
+    This is the Trauma Response Personality Indicator (TRPI) test developed based on the 4 trauma responses: Fight, Flight, Fawn, and Freeze. 
+    It has 20 questions, 10 to determine which trauma response fits you best and 10 to determine which type of brain you have.
+    According to this theory the Myers-Briggs types can be divided into 4 categories, see this link for more info: https://imgur.com/a/Y57r9nY
+    `
+    var context = genComponent('context title', 'div', explanation)
     var start = genComponent('start', 'button', '<p>Start!</p>', '', {
         ['onclick']: 'next()'
     })
+    content.appendChild(context);
+
     content.appendChild(start);
 }
 
@@ -306,7 +314,10 @@ function next() {
     genQuestions();
     var content = document.querySelector('.content')
     var nextButton = content.querySelector('.start')
+    var explanation = content.querySelector('.context')
     removeComponent(content, nextButton)
+    removeComponent(content, explanation)
+
     var gender = genComponent('title', 'div', 'Are you a man or a woman?')
     var genders = ['Man', 'Woman', 'Private'].map(opt => {
         return genComponent('option', 'button', opt, '', {
