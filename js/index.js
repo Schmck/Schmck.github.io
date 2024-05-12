@@ -475,6 +475,11 @@ function nextQuestion() {
         })
 
         replaceComponent(content, docQuestion, answer)
+        save({
+            answers: state.answers,
+            gender: state.gender,
+            types: state.types
+        })
     }
 
 }
@@ -496,4 +501,56 @@ function selectOption(option) {
     state.phase[phase] = state.phase[phase] + 1
     state.answers[phase][Object.keys(state.questions[phase])[num]] = option
     nextQuestion();
+}
+
+function guid() {
+    const cryptoObj = window.crypto || window.msCrypto; // for IE11
+    if (!cryptoObj) {
+        console.error('Crypto API not available');
+        return null;
+    }
+
+    const randomArray = new Uint8Array(16);
+    cryptoObj.getRandomValues(randomArray);
+
+    randomArray[6] = (randomArray[6] & 0x0f) | 0x40; // Version 4
+    randomArray[8] = (randomArray[8] & 0x3f) | 0x80; // Variant bits
+
+    let guid = '';
+    for (let i = 0; i < 16; i++) {
+        guid += (i === 4 || i === 6 || i === 8 || i === 10) ? '-' : '';
+        guid += (randomArray[i] < 16 ? '0' : '') + randomArray[i].toString(16);
+    }
+
+    return guid.toLowerCase(); // Convert to lowercase as GUIDs are typically represented in lowercase
+};
+
+async function save(state) {
+    const apiKey = '$2a$10$q3P7Zn7sUJLykm7PHc2d4.zvCgVdfmt8tVVK38jEdNC947RlZgoOG'; // Your JSONBin.io API key
+    const url = 'https://api.jsonbin.io/v3/b'; // JSONBin.io base URL for creating bins
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Master-Key': apiKey
+            },
+            body: JSON.stringify({
+                [guid()]: {...state, date: new Date().toISOString() }
+            })
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to create bin');
+        }
+
+        const responseData = await response.json();
+        console.log('Bin created successfully:', responseData);
+
+        return responseData;
+    } catch (error) {
+        console.error('Error creating bin:', error);
+        throw error;
+    }
 }
