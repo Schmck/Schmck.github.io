@@ -278,17 +278,6 @@ function update(key, value) {
     state[key] = value
 }
 
-
-function start() {
-    fill(360)
-
-    var content = document.querySelector('.content');
-    var start = genComponent('start', 'button', '<p>Start!</p>', '', {
-        ['onclick']: 'next()'
-    })
-    content.appendChild(start);
-}
-
 function fill(num) {
     const grid = document.querySelector('.grid')
     for (let i = 0; i < num; i++) {
@@ -301,12 +290,35 @@ function genPlus() {
     return plus
 }
 
+function start() {
+    fill(360)
+
+    var content = document.querySelector('.content');
+    var start = genComponent('start', 'button', '<p>Start!</p>', '', {
+        ['onclick']: 'next()'
+    })
+    content.appendChild(start);
+}
+
+
+
 function next() {
     genQuestions();
     var content = document.querySelector('.content')
     var nextButton = content.querySelector('.start')
     removeComponent(content, nextButton)
-    nextQuestion();
+    var gender = genComponent('title', 'div', 'Are you a man or a woman?')
+    var genders = ['Man', 'Woman', 'Private'].map(opt => {
+        return genComponent('option', 'button', opt, '', {
+            ['onclick']: 'selectOption(innerHTML)'
+        })
+    })
+
+    //nextQuestion();
+
+    var options = genComponent('btn-group', 'div', '', '', {}, genders)
+    var question = genComponent('question', 'div', '', '', {}, [gender, options])
+    content.appendChild(question)
 }
 
 function genQuestions() {
@@ -337,6 +349,19 @@ function nextQuestion() {
         console.log(state)
 
         var options = { 'Fight': 0, 'Freeze': 0, 'Fawn': 0, 'Flight': 0, }
+
+        if (state.gender !== 'Private') {
+
+            if (state.gender == 'Man') {
+                options['Fight'] = 3
+                options['Freeze'] = 3
+            }
+
+            if (state.gender == 'Woman') {
+                options['Fawn'] = 3
+                options['Flight'] = 3
+            }
+        }
         var mode = '';
         Object.values(state.answers['FFFF']).forEach(answer => {
             var char = answer.trimStart().slice(0, 1)
@@ -380,6 +405,7 @@ function nextQuestion() {
         var type2 = Object.keys(state.types[phase])[1]
         var type3 = Object.keys(state.types[phase])[2]
         var type4 = Object.keys(state.types[phase])[3]
+
 
         Object.values(state.answers[phase]).forEach(answer => {
             var char = answer.trimStart().slice(0, 1)
@@ -428,7 +454,7 @@ function nextQuestion() {
                 .map(value => [value[0], Object.keys(value[1])])
                 .find(value => value[1].includes(val))[0]
 
-            var line = genComponent(`line.${mode} ${val == type ? 'primary' : ''}`, 'div', val)
+            var line = genComponent(`line ${mode} ${val == type ? 'primary' : ''}`, 'div', val)
             return line;
         })
         var answer = genComponent('answer', 'div')
@@ -447,6 +473,9 @@ function selectOption(option) {
     var phase = Object.keys(state.phase)[0]
     var num = state.phase[phase]
 
+    if (option == 'Man' || option == 'Woman' || option == 'Private') {
+        update('gender', option)
+    }
 
     if (!state.answers[phase]) {
         state.answers[phase] = {}
