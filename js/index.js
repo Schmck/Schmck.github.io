@@ -297,7 +297,7 @@ function start() {
     var explanation = `
     This is the Trauma Response Personality Indicator (TRPI) test developed based on the 4 trauma responses: Fight, Flight, Fawn, and Freeze. 
     It has 20 questions, 10 to determine which trauma response fits you best and 10 to determine which type of brain you have.
-    According to this theory the Myers-Briggs types can be divided into 4 categories, see this link for more info: https://imgur.com/a/Y57r9nY 
+    According to this theory the Myers-Briggs types can be divided into 4 categories, see this link for more info: <a href="https://reddit.com/r/mbti/comments/1chusy5/trpi_trauma_response_personality_indicator/">TRPI</a>
     Try to think as little as possible and just go with your gut because its who you are!
     `
     var context = genComponent('context title', 'div', explanation)
