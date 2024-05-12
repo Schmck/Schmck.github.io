@@ -1,12 +1,18 @@
-import { genComponent, removeComponent, replaceComponent } from "./render";
-import { parser } from "./parser";
-import {set, update, get } from "./this.state";
+let state = {
+    questions: {},
+    phase: {
+        "FFFF": 0,
+    },
+    types: {
+        'Fight': { 'ENTP': 0, 'ESTP': 0, 'ENTJ': 0, 'ESTJ': 0, },
+        'Freeze': { 'INTJ': 0, 'ISTJ': 0, 'INTP': 0, 'ISTP': 0, },
+        'Fawn': { 'ISFJ': 0, 'INFJ': 0, 'ESFJ': 0, 'ENFJ': 0, },
+        'Flight': { 'ESFP': 0, 'ENFP': 0, 'ISFP': 0, 'INFP': 0, },
+    },
+    answers: {}
+}
 
-
-export class TRPI {
-    constructor() {
-        this.state = get()
-        this.input = `
+const input = `
         1.	Imagine you're walking alone at night, and suddenly someone approaches you aggressively, demanding your belongings. In this situation, would you:
         a) Stand your ground and refuse to comply, ready to defend yourself if necessary  
         b) Attempt to run away from the attacker  
@@ -119,7 +125,7 @@ export class TRPI {
         b) Listen attentively but contribute little to the conversation, feeling reserved 
         c) Politely engage in small talk while feeling uncomfortable with the interaction  
         d) Keep to yourself and observe the party from a distance, feeling hesitant to mingle  
-        3.	During a team meeting, your supervisor asks for your this.input on a new project. How do you respond? 
+        3.	During a team meeting, your supervisor asks for your input on a new project. How do you respond? 
         a) Feel overwhelmed by the attention and prefer to blend into the background  
         b) Provide concise and practical suggestions, focusing on the task at hand 
         c) Feel unsure of what to say and struggle to articulate your thoughts  
@@ -264,172 +270,190 @@ export class TRPI {
         d) Politely excuse yourself from the area and find a quieter space at the party 
         `
 
+window.onload = start()
 
-        window.onload = this.start()
+
+function update(key, value) {
+    console.log(state, key, value)
+    state[key] = value
+}
+
+
+function start() {
+    fill(360)
+
+    var content = document.querySelector('.content');
+    var start = genComponent('start', 'button', '<p>Start!</p>', '', {
+        ['onclick']: 'next()'
+    })
+    content.appendChild(start);
+}
+
+function fill(num) {
+    const grid = document.querySelector('.grid')
+    for (let i = 0; i < num; i++) {
+        grid.append(genPlus())
     }
+}
 
-    start() {
-        this.fill(360)
+function genPlus() {
+    var plus = genComponent('plusBox', 'div', '<div class="lineUp"></div><div class="lineSide"></div>')
+    return plus
+}
 
-        var content = document.querySelector('.content');
-        var start = genComponent('start', button, '<p>Start!</p>', '', {
-            ['onclick']: 'next()'
+function next() {
+    genQuestions();
+    var content = document.querySelector('.content')
+    var nextButton = content.querySelector('.start')
+    removeComponent(content, nextButton)
+    nextQuestion();
+}
+
+function genQuestions() {
+    update("questions", parser(input))
+}
+
+function genQuestion(question, answers) {
+    var opts = Object.values(answers).map(opt => {
+        return genComponent('option', 'button', opt, '', {
+            ['onclick']: 'selectOption(innerHTML)'
         })
-        content.appendChild(start);
-    }
+    })
+    var title = genComponent('title', 'div', question)
+    var options = genComponent('btn-group', 'div', '', '', {}, opts)
+    var qstn = genComponent('question', 'div', '', '', {}, [title, options])
 
-    fill(num) {
-        const grid = document.querySelector('.grid')
-        for (let i = 0; i < num; i++) {
-            grid.append(genPlus())
-        }
-    }
+    return qstn
+}
 
-    genPlus() {
-        var plus = genComponent('plusBox', 'div', '<div class="lineUp"></div><div class="lineSide"></div>')
-        return plus
-    }
+function nextQuestion() {
+    var phase = Object.keys(state.phase)[0]
+    var num = state.phase[phase]
+    var type = '';
 
-    next() {
-        genQuestions();
-        var content = document.querySelector('.content')
-        var nextButton = content.querySelector('.start')
-        removeComponent(content, nextButton)
-        nextQuestion();
-    }
 
-    genQuestions() {
-        update(questions, parser(this.input))
-    }
+    console.log(phase)
+    if (phase == 'FFFF' && state.phase[phase] == 10) {
+        console.log(state)
 
-    genQuestion(question, answers) {
-        var opts = Object.values(answers).map(opt => {
-            return genComponent('option', 'button', opt, '', {
-                ['onclick']: 'selectOption(this.innerHTML)'
-            })
+        var options = { 'Fight': 0, 'Freeze': 0, 'Fawn': 0, 'Flight': 0, }
+        var mode = '';
+        Object.values(state.answers['FFFF']).forEach(answer => {
+            var char = answer.trimStart().slice(0, 1)
+            console.log(char)
+            if (char == 'a') {
+                options['Fight'] = options['Fight'] + 1
+            }
+            if (char == 'b') {
+                options['Flight'] = options['Flight'] + 1
+            }
+            if (char == 'c') {
+                options['Freeze'] = options['Freeze'] + 1
+            }
+            if (char == 'd') {
+                options['Fawn'] = options['Fawn'] + 1
+            }
+
         })
-        var title = genComponent('title', question)
-        var options = genComponent('btn-group', '', '', {}, opts)
-        var qstn = genComponent('question', '', '', {}, [title, options])
 
-        return qstn
-    }
-
-    nextQuestion() {
-        var phase = Object.keys(this.state.phase)[0]
-        var num = this.state.phase[phase]
-        var type = '';
+        let count = 0;
 
 
-        if (phase == 'FFFF' && this.state.phase[phase] == 10) {
-            console.log(this.state)
+        Object.entries(options).forEach(([key, value]) => {
+            if (value > count) {
+                count = value;
+                mode = key;
+            }
+        });
 
-            var options = { 'Fight': 0, 'Freeze': 0, 'Fawn': 0, 'Flight': 0, }
-            var mode = '';
-            Object.values(this.state.answers['FFFF']).forEach(answer => {
-                var char = answer.slice(0, 1)
-                console.log(char)
-                if (char == 'a') {
-                    options['Fight'] = options['Fight'] + 1
-                }
-                if (char == 'b') {
-                    options['Flight'] = options['Flight'] + 1
-                }
-                if (char == 'c') {
-                    options['Freeze'] = options['Freeze'] + 1
-                }
-                if (char == 'd') {
-                    options['Fawn'] = options['Fawn'] + 1
-                }
-
-            })
-
-            let count = 0;
-
-
-            Object.entries(options).forEach(([key, value]) => {
-                if (value > count) {
-                    count = value;
-                    mode = key;
-                }
-            });
-
-            update('phase', {
-                [mode]: 0
-            })
-            phase = mode;
-            num = 0
-
+        state.phase = {
+            [mode]: 0
         }
-
-        if (phase != 'FFFF' && this.state.phase[phase] == 10) {
-            var options = this.state.types[phase]
-            var type1 = Object.keys(this.state.types[phase])[0]
-            var type2 = Object.keys(this.state.types[phase])[1]
-            var type3 = Object.keys(this.state.types[phase])[2]
-            var type4 = Object.keys(this.state.types[phase])[3]
-
-            Object.values(this.state.answers[phase]).forEach(answer => {
-                var char = answer.slice(0, 1)
-                console.log(char)
-                if (char == 'a') {
-                    options[type1] = options[type1] + 1
-                }
-                if (char == 'b') {
-                    options[type2] = options[type2] + 1
-                }
-                if (char == 'c') {
-                    options[type3] = options[type3] + 1
-                }
-                if (char == 'd') {
-                    options[type4] = options[type4] + 1
-                }
-            })
-
-            let count = 0;
-
-
-            Object.entries(options).forEach(([key, value]) => {
-                if (value > count) {
-                    count = value;
-                    type = key;
-                }
-            });
-        }
-
-        var content = document.querySelector('.content')
-        var docQuestion = content.querySelector('.question')
-        if (!type) {
-            var question = Object.keys(this.state.questions[phase])[num];
-            var answers = Object.values(this.state.questions[phase])[num]
-
-            var question = genQuestion(question, answers);
-
-            replaceComponent(content, docQuestion, question)
-        } else {
-            var answer = genComponent('answer', 'div', `Congratulations you are an ${type}!`)
-            replaceComponent(content, docQuestion, answer)
-        }
+        phase = mode;
+        num = 0
 
     }
 
-    selectOption(option) {
-        var phase = Object.keys(this.state.phase)[0]
-        var num = this.state.phase[phase]
+    if (phase != 'FFFF' && state.phase[phase] == 10) {
+        var options = state.types[phase]
+        var type1 = Object.keys(state.types[phase])[0]
+        var type2 = Object.keys(state.types[phase])[1]
+        var type3 = Object.keys(state.types[phase])[2]
+        var type4 = Object.keys(state.types[phase])[3]
+
+        Object.values(state.answers[phase]).forEach(answer => {
+            var char = answer.trimStart().slice(0, 1)
+            console.log(char)
+            if (char == 'a') {
+                options[type1] = options[type1] + 1
+            }
+            if (char == 'b') {
+                options[type2] = options[type2] + 1
+            }
+            if (char == 'c') {
+                options[type3] = options[type3] + 1
+            }
+            if (char == 'd') {
+                options[type4] = options[type4] + 1
+            }
+        })
+
+        let count = 0;
 
 
-        if (!this.state.answers[phase]) {
-            this.state.answers[phase] = {}
-        }
+        Object.entries(options).forEach(([key, value]) => {
+            if (value > count) {
+                count = value;
+                type = key;
+            }
+        });
+    }
 
+    var content = document.querySelector('.content')
+    var docQuestion = content.querySelector('.question')
+    if (!type) {
+        var question = Object.keys(state.questions[phase])[num];
+        var answers = Object.values(state.questions[phase])[num]
 
+        var question = genQuestion(question, answers);
 
-        update(`phase[${phase}]`, this.state.phase[phase] + 1)
-        update(`answers[${phase}][${Object.keys(this.state.questions[phase])[num]}]`, option)
-        nextQuestion();
+        replaceComponent(content, docQuestion, question)
+    } else {
+
+        var prefix = genComponent('prefix', 'div', `Congratulations you are an`)
+
+        var col = Object.keys(state.types[phase]).indexOf(type)
+        var fourSides = Object.values(state.types).map(val => Object.keys(val)[col]).map(val => {
+            var mode = Object.entries(state.types)
+                .map(value => [value[0], Object.keys(value[1])])
+                .find(value => value[1].includes(val))[0]
+
+            var line = genComponent(`line.${mode} ${val == type ? 'primary' : ''}`, 'div', val)
+            return line;
+        })
+        var answer = genComponent('answer', 'div')
+        answer.appendChild(prefix)
+        fourSides.forEach(side => {
+            answer.appendChild(side)
+        })
+
+        replaceComponent(content, docQuestion, answer)
     }
 
 }
 
-const trpiInstance = new TRPI();
-trpiInstance.start();
+function selectOption(option) {
+    console.log(option)
+    var phase = Object.keys(state.phase)[0]
+    var num = state.phase[phase]
+
+
+    if (!state.answers[phase]) {
+        state.answers[phase] = {}
+    }
+
+
+    state.phase[phase] = state.phase[phase] + 1
+    state.answers[phase][Object.keys(state.questions[phase])[num]] = option
+    nextQuestion();
+}

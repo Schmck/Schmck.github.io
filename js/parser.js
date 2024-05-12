@@ -1,4 +1,4 @@
-export function parser(input) {
+function parser(input) {
     var unparsed = input.split('#').map(qstns => qstns.split(/\t/)).map(qstn => qstn.slice(1, qstn.length))
     let questions = {}
     unparsed.forEach((list, i) => {
