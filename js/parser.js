@@ -1,5 +1,5 @@
 function parser(input) {
-    var unparsed = input.split('#').map(qstns => qstns.split(/\t/)).map(qstn => qstn.slice(1, qstn.length))
+    var unparsed = input.replaceAll(/\([A-Z]+\)/g, '').split('#').map(qstns => qstns.split(/\t/)).map(qstn => qstn.slice(1, qstn.length))
     let questions = {}
     unparsed.forEach((list, i) => {
         list.forEach(question => {
