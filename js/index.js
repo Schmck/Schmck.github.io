@@ -531,6 +531,14 @@ function selectOption(option) {
 }
 
 function guid() {
+    let guid = localStorage.getItem('guid') || '';
+
+    if (guid) {
+        console.log(guid)
+        return guid
+    }
+
+
     const cryptoObj = window.crypto || window.msCrypto; // for IE11
     if (!cryptoObj) {
         console.error('Crypto API not available');
@@ -543,12 +551,12 @@ function guid() {
     randomArray[6] = (randomArray[6] & 0x0f) | 0x40; // Version 4
     randomArray[8] = (randomArray[8] & 0x3f) | 0x80; // Variant bits
 
-    let guid = '';
     for (let i = 0; i < 16; i++) {
         guid += (i === 4 || i === 6 || i === 8 || i === 10) ? '-' : '';
         guid += (randomArray[i] < 16 ? '0' : '') + randomArray[i].toString(16);
     }
 
+    localStorage.setItem('guid', guid.toLowerCase());
     return guid.toLowerCase(); // Convert to lowercase as GUIDs are typically represented in lowercase
 };
 
@@ -564,6 +572,7 @@ async function save(state) {
                 'X-Master-Key': apiKey
             },
             body: JSON.stringify({
+                id: guid(),
                 [guid()]: {...state, date: new Date().toISOString() }
             })
         });
@@ -580,4 +589,16 @@ async function save(state) {
         console.error('Error creating bin:', error);
         throw error;
     }
+}
+
+function getUniqueId(guid) {
+    let uniqueId = localStorage.getItem('guid');
+
+    if (!uniqueId) {
+        // If no unique identifier exists, generate one and store it in local storage
+        uniqueId = generateUniqueId();
+        localStorage.setItem('guid', uniqueId);
+    }
+
+    return uniqueId;
 }
