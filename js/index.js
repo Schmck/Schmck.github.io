@@ -517,7 +517,7 @@ function selectOption(option) {
     var num = state.phase[phase]
     var genders = ["Man", "Woman", "Private"];
 
-    if (genders.indexOf(option)) {
+    if (genders.includes(option)) {
         update('gender', option)
     } else {
         if (!state.answers[phase]) {
