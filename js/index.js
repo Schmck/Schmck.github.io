@@ -515,18 +515,20 @@ function selectOption(option) {
     console.log(option)
     var phase = Object.keys(state.phase)[0]
     var num = state.phase[phase]
+    var genders = ["Man", "Woman", "Private"];
 
-    if (option == 'Man' || option == 'Woman' || option == 'Private') {
+    if (genders.indexOf(option)) {
         update('gender', option)
+    } else {
+        if (!state.answers[phase]) {
+            state.answers[phase] = {}
+        }
+
+        state.phase[phase] = state.phase[phase] + 1
+        state.answers[phase][Object.keys(state.questions[phase])[num]] = option
     }
 
-    if (!state.answers[phase]) {
-        state.answers[phase] = {}
-    }
 
-
-    state.phase[phase] = state.phase[phase] + 1
-    state.answers[phase][Object.keys(state.questions[phase])[num]] = option
     nextQuestion();
 }
 
