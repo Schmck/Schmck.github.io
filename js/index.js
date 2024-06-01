@@ -11,7 +11,7 @@ let state = {
     },
     answers: {}
 }
-
+const types = { "ENTP": { "Mode": "FIGHT", "Sphere": "Innovative, enthusiastic, and argumentative. ENTPs love to explore ideas and challenge the status quo." }, "INTJ": { "Mode": "FREEZE", "Sphere": "Analytical, strategic, and independent. INTJs excel at planning and executing long-term goals." }, "ISFJ": { "Mode": "FAWN", "Sphere": "Caring, meticulous, and responsible. ISFJs are dedicated to supporting and protecting others." }, "ESFP": { "Mode": "FLIGHT", "Sphere": "Energetic, fun-loving, and spontaneous. ESFPs love to engage with others and enjoy the present moment." }, "ENTJ": { "Mode": "FIGHT", "Sphere": "Strategic, efficient, and natural leaders. ENTJs excel in organizing and executing plans." }, "INTP": { "Mode": "FREEZE", "Sphere": "Theoretical, curious, and logical. INTPs love exploring abstract concepts and ideas." }, "ESFJ": { "Mode": "FAWN", "Sphere": "Social, supportive, and organized. ESFJs thrive in roles that involve helping others and fostering community." }, "ISFP": { "Mode": "FLIGHT", "Sphere": "Artistic, sensitive, and flexible. ISFPs are driven by personal values and a desire for authentic experiences." }, "ESTP": { "Mode": "FIGHT", "Sphere": "Action-oriented, adaptable, and resourceful. ESTPs thrive in dynamic environments and enjoy taking risks." }, "ISTJ": { "Mode": "FREEZE", "Sphere": "Reliable, detail-oriented, and methodical. ISTJs excel in maintaining order and following procedures." }, "INFJ": { "Mode": "FAWN", "Sphere": "Insightful, idealistic, and compassionate. INFJs are driven by a deep understanding of human nature and a desire to make a difference." }, "ESTJ": { "Mode": "FIGHT", "Sphere": "Organized, practical, and dependable. ESTJs are skilled at managing people and resources." }, "ENFJ": { "Mode": "FAWN", "Sphere": "Inspiring, charismatic, and empathetic. ENFJs excel at motivating and guiding others." }, "ISTP": { "Mode": "FREEZE", "Sphere": "Practical, hands-on, and independent. ISTPs are skilled at troubleshooting and finding solutions." }, "ENFP": { "Mode": "FLIGHT", "Sphere": "Enthusiastic, imaginative, and sociable. ENFPs are passionate about exploring new ideas and possibilities." }, "INFP": { "Mode": "FLIGHT", "Sphere": "Reflective, empathetic, and creative. INFPs are guided by their personal values and a desire for authenticity." } }
 const input = `
 1.	Imagine you're walking alone at night, and suddenly someone approaches you aggressively, demanding your belongings. In this situation, would you:
 a) Stand your ground and refuse to comply, ready to defend yourself if necessary  
@@ -381,7 +381,7 @@ function nextQuestion() {
 
 
     console.log(phase)
-    if (phase == 'FFFF' && state.phase[phase] == 11) {
+    if (phase == 'FFFF' && state.phase[phase] >= 11) {
         console.log(state)
 
         var options = { 'Fight': 0, 'Freeze': 0, 'Fawn': 0, 'Flight': 0, }
@@ -435,7 +435,7 @@ function nextQuestion() {
 
     }
 
-    if (phase != 'FFFF' && state.phase[phase] == 11) {
+    if (phase != 'FFFF' && state.phase[phase] >= 11) {
         var options = state.types[phase]
         var type1 = Object.keys(state.types[phase])[0]
         var type2 = Object.keys(state.types[phase])[1]
@@ -483,20 +483,23 @@ function nextQuestion() {
     } else {
         var phase = Object.keys(state.phase)[0]
         var mode = genComponent('mode', 'div', `You operate primarily in ${phase} mode`)
-        var prefix = genComponent('prefix', 'div', `Congratulations you are an`)
+            //var prefix = genComponent('prefix', 'div', `Congratulations you are an`)
+
 
         var col = Object.keys(state.types[phase]).indexOf(type)
         var fourSides = Object.values(state.types).map(val => Object.keys(val)[col]).map(val => {
-            var mode = Object.entries(state.types)
-                .map(value => [value[0], Object.keys(value[1])])
-                .find(value => value[1].includes(val))[0]
+                    var mode = Object.entries(state.types)
+                        .map(value => [value[0], Object.keys(value[1])])
+                        .find(value => value[1].includes(val))[0]
 
-            var line = genComponent(`line ${mode} ${val == type ? 'primary' : ''}`, 'div', val)
+                    var description = types[val]
+                    var descriptionComponent = genComponent('description', 'div', `${Object.entries(description).map(desc => `<p class=${desc[0]}>${desc[1]}</p>`).join('\n')}`)
+            var line = genComponent(`line ${mode} ${val == type ? 'primary' : ''}`, 'div', val, '', {}, [descriptionComponent])
             return line;
         })
         var answer = genComponent('answer', 'div')
         answer.appendChild(mode)
-        answer.appendChild(prefix)
+        //answer.appendChild(prefix)
         fourSides.forEach(side => {
             answer.appendChild(side)
         })

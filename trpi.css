@@ -53,6 +53,12 @@ div {
     margin: 100px
 }
 
+.description {
+    -webkit-text-stroke-width: 0PX;
+    font-size: 25px;
+    width: 235;
+}
+
 .start {
     appearance: none;
     background-color: transparent;
@@ -205,25 +211,28 @@ div {
 }
 
 .line {
-    position: relative;
-    left: 30%;
-    width: 72%;
+    position: absolute;
+    top: 80px;
+}
+
+.line.Fight {
+    color: red;
+    left: -100px;
+}
+
+.line.Freeze {
+    color: blue;
+    left: 175px;
 }
 
 .line.Fawn {
     color: rebeccapurple;
-}
-
-.line.Fight {
-    color: red
-}
-
-.line.Freeze {
-    color: blue
+    left: 475px;
 }
 
 .line.Flight {
-    color: green
+    color: green;
+    left: 750px;
 }
 
 .primary {
