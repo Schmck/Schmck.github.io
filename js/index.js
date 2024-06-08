@@ -498,13 +498,14 @@ function nextQuestion() {
             return line;
         })
         var answer = genComponent('answer', 'div')
-        answer.appendChild(mode)
+        //answer.appendChild(mode)
         //answer.appendChild(prefix)
         fourSides.forEach(side => {
             answer.appendChild(side)
         })
 
         replaceComponent(content, docQuestion, answer)
+        content.appendChild(mode)
         save({
             answers: state.answers,
             gender: state.gender,
