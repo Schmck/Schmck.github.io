@@ -315,6 +315,7 @@ function genPlus() {
 }
 
 function start() {
+    document.title = 'TRPI'
     fill(360)
 
     var content = document.querySelector('.content');
@@ -486,6 +487,7 @@ function nextQuestion() {
             //var prefix = genComponent('prefix', 'div', `Congratulations you are an`)
 
 
+        document.title = type;
         var col = Object.keys(state.types[phase]).indexOf(type)
         var fourSides = Object.values(state.types).map(val => Object.keys(val)[col]).map(val => {
                     var mode = Object.entries(state.types)
